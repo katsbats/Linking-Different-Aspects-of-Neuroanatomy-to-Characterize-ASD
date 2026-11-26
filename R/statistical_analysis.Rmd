@@ -200,6 +200,8 @@ ols <- lm(subject_courses_ASD_matrix[,1] ~ behaviourals_ASD$ADOS_2_total_gotham_
           as.factor(behaviourals_ASD$SITE_ID))
 df.residual(ols)
 
+modality_contributions_tp[c(1), ]
+
 # Higher IC1 loadings are associated with higher ADOS scores.
 # Participants with more severe autism symptoms show stronger expression of the IC1 pattern.
 
