@@ -29,4 +29,4 @@ cfg = cfg_defaults(cfg);
 % Run analysis
 main(cfg);
 
-
+% Results of the analysis are saved in the toolbox 
