@@ -186,7 +186,7 @@ CT <- CT[,-2]#remove IC because we only have one
 
 colnames(CT) <- c("StructName", "direction", "modality","hemisphere", "overlap_pct")  
 CT <- CT [order(CT$overlap_pct, decreasing = TRUE),]
-CT <- distinct(Ct)
+CT <- distinct(CT)
 
 # Renaming the labels 
 CT$StructName <- dplyr::recode(CT$StructName,
@@ -508,7 +508,7 @@ colnames(jd_1)
 ### IC1 Destrieux ###
 ```{r}
 # This block computes the spatial overlap of SA and CT for IC37 in the destrieux altas
-## Cortical Thickness ##
+## Cortical Thickness ##
 ct1 <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/150ica_secondfilter/CT_R/Overlap_percentages_bin_surface01.txt', comment.char = "#")
 
 
@@ -824,7 +824,7 @@ ggsave('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/mod
 ```
 
 
-## Supplementary tables (APA 7 formatting)
+## Supplementary tables 
 ```{r}
 # Overlap data 
 vol37  <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/vol_data_IC37.csv')
