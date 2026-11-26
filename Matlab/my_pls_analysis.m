@@ -36,7 +36,7 @@ res_folder = fullfile(cfg.dir.project, 'framework/pls_permutation/res/level1');
 
 load(fullfile(cfg.dir.project, 'data', 'X.mat'), 'X');   % 405 x 8 clinical
 load(fullfile(cfg.dir.project, 'data', 'Y.mat'), 'Y');   % 405 x 150 brain
-load(fullfile(res_folder, 'model_1.mat'), 'wX', 'wY');     % saliences from the toolkit
+load(fullfile(res_folder, 'model_1.mat'), 'wX', 'wY');   % saliences from the toolkit
 wX = wX(:);  wY = wY(:);
 
 %% 
@@ -78,7 +78,7 @@ for b = 1:n_boot
     Xb = zscore(X(idx,:));      % re-standardize within the resample
     Yb = zscore(Y(idx,:));
 
-    C = Xb' * Yb;               % now a proper cross-covariance
+    C = Xb' * Yb;               
     [U,~,V] = svd(C,'econ');
     wXb = U(:,1);
     wYb = V(:,1);
@@ -94,9 +94,6 @@ end
 %% BSR 
 bsr_X = wX ./ std(boot_wX)';
 bsr_Y = wY ./ std(boot_wY)';
-
-p_X = 2*normcdf(-abs(bsr_X));
-p_Y = 2*normcdf(-abs(bsr_Y));
 
 fprintf('\nreliable clinical: %d of %d\n', sum(abs(bsr_X)>2), numel(bsr_X));
 fprintf('reliable brain ICs: %d of %d  (chance ~7)\n', sum(abs(bsr_Y)>2), numel(bsr_Y));
