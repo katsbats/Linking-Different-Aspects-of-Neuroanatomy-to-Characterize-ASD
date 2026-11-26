@@ -1,0 +1,107 @@
+---
+title: "Noise_analysis"
+author: "Katharina Bremer"
+date: "2026-11-02"
+output: html_document
+---
+
+
+# Noise analysis FLICA components
+```{r}
+library(dplyr)
+library(effectsize)
+```
+
+## Load data
+```{r}
+behaviourals_all <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter.csv')
+
+flica_dir <- '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_Format/150ica_secondfilter/'
+
+# Subject courses: one row per subject, one column per IC
+subject_courses_tp <- t(read.table(paste0(flica_dir, 'subjectCoursesOut.txt')))
+subject_courses_tp <- subject_courses_tp[, colSums(subject_courses_tp == 0) != nrow(subject_courses_tp)]  # drop all-zero ICs
+
+stopifnot(nrow(subject_courses_tp) == nrow(behaviourals_all))  # same subjects, same order
+stopifnot(ncol(subject_courses_tp) == 150)                      # no IC was dropped, so IC numbers stay correct
+colnames(subject_courses_tp) <- paste0("IC", 1:150)
+
+# Modality contributions: one row per IC
+modality_contributions_tp <- t(read.table(paste0(flica_dir, 'Modality_contributions.txt')))
+colnames(modality_contributions_tp) <- c("JD", "VBM", "CT", "PA")
+rownames(modality_contributions_tp) <- paste0("IC", 1:150)
+
+# Multimodality index per IC
+multimodal <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/multimodal.csv',
+                       header = TRUE, row.names = 1)
+
+# QC measures, in the same subject order as the subject courses
+surface_holes <- readRDS('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE_final_sitewise_all.rds') %>%
+  filter(SUB_ID %in% behaviourals_all$SUB_ID) %>%
+  arrange(match(SUB_ID, behaviourals_all$SUB_ID))
+stopifnot(all(surface_holes$SUB_ID == behaviourals_all$SUB_ID))
+
+IQR_all <- bind_rows(
+  read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/IQR/CAT12_IQR_ABIDE1.csv'),
+  read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/IQR/CAT12_IQR_ABIDE2.csv')
+) %>%
+  mutate(SUB_ID = as.integer(as.character(SUB_ID))) %>%
+  filter(SUB_ID %in% behaviourals_all$SUB_ID) %>%
+  arrange(match(SUB_ID, behaviourals_all$SUB_ID))
+stopifnot(all(IQR_all$SUB_ID == behaviourals_all$SUB_ID))
+```
+
+## Association of each IC with site and image quality
+```{r}
+site <- as.factor(behaviourals_all$SITE_ID)
+age  <- behaviourals_all$AGE_AT_SCAN
+sex  <- as.factor(behaviourals_all$SEX)
+
+eta_site <- r_holes <- r_iqr <- numeric(150)
+
+for (i in 1:150) {
+  y <- subject_courses_tp[, i]
+  # Site: partial eta squared of site in a model 
+  eta_site[i] <- eta_squared(lm(y ~ site + age + sex))$Eta2[1]
+  # Image quality: correlation with FreeSurfer surface holes and CAT12 IQR
+  r_holes[i]  <- cor(y, surface_holes$SurfaceHoles)
+  r_iqr[i]    <- cor(y, IQR_all$IQR)
+}
+
+quality_table <- data.frame(
+  IC         = 1:150,
+  eta2_site  = eta_site,
+  r2_holes   = r_holes^2,
+  r2_iqr     = r_iqr^2,
+  multimodal = multimodal$multimodal,
+  JD         = round(modality_contributions_tp[, "JD"],  3),
+  VBM        = round(modality_contributions_tp[, "VBM"], 3),
+  CT         = round(modality_contributions_tp[, "CT"],  3),
+  PA         = round(modality_contributions_tp[, "PA"],  3)
+)
+```
+
+## Noise score and noisy ICs
+```{r}
+# One point per criterion; ICs with >= 3 are flagged
+quality_table$noise_score <-
+  (quality_table$eta2_site  > 0.14) +
+  (quality_table$r2_holes   > 0.02) +
+  (quality_table$r2_iqr     > 0.02) +
+  (quality_table$multimodal < 0.40)
+
+table(quality_table$noise_score)
+
+noisy_IC_names <- paste0("IC", quality_table$IC[quality_table$noise_score >= 3])
+noisy_IC_names
+```
+
+## Supplementary table for the thesis
+```{r}
+supp_table <- quality_table %>%
+  select(IC, VBM, JD, CT, SA = PA, MMI = multimodal,
+         eta2_site, r2_holes, r2_iqr, noise_score) %>%
+  mutate(across(c(MMI, eta2_site, r2_holes, r2_iqr), ~ round(.x, 3)))
+
+write.csv(supp_table, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/supp_quality_table.csv', row.names = FALSE)
+```

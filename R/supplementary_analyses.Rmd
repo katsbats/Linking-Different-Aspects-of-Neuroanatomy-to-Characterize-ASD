@@ -1,0 +1,142 @@
+---
+title: "supplementary analyses"
+author: "Katharina Bremer"
+date: "2026-11-02"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(car)
+
+# Subject courses
+subject_courses <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_Format/150ica_secondfilter/subjectCoursesOut.txt')
+subject_courses_tp <- t(subject_courses)
+
+subject_courses_tp <- subject_courses_tp[, colSums(subject_courses_tp == 0) != nrow(subject_courses_tp)]
+
+behaviourals_all <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter.csv')
+behaviourals_all$SUB_ID <- as.character(as.integer(behaviourals_all$SUB_ID))
+
+# Confirm id order is the same as the LICA input
+lica_ids <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Input/FSL_second_filter.txt')$V1
+stopifnot(nrow(subject_courses_tp) == nrow(behaviourals_all))                     # same number of subjects
+stopifnot(all(as.character(lica_ids) == as.character(behaviourals_all$SUB_ID)))   # same order
+```
+
+# Load brain size (TBV) from FreeSurfer and behavioral data
+```{r}
+cortical_vol <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/FreeSurfer/FreeSurfer_Output_ABIDE.csv')
+behaviourals_all$BrainSeg <- cortical_vol$BrainSegVolNotVent[
+  match(behaviourals_all$SUB_ID, as.character(cortical_vol$SUB_ID))
+]
+stopifnot(!any(is.na(behaviourals_all$BrainSeg)))
+
+# ASD data (imputed) and matching subject courses
+subject_courses_tp_ids <- data.frame(SUB_ID = behaviourals_all$SUB_ID, subject_courses_tp)
+behaviourals_ASD <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Imputation/imputed_data_final_FSL.csv')
+behaviourals_ASD$SUB_ID <- as.character(as.integer(behaviourals_ASD$SUB_ID))
+
+subject_courses_ASD <- subject_courses_tp_ids[match(behaviourals_ASD$SUB_ID, subject_courses_tp_ids$SUB_ID), ]
+cat("IDs in same order?", all(subject_courses_ASD$SUB_ID == behaviourals_ASD$SUB_ID), "\n")
+subject_courses_ASD_matrix <- as.matrix(subject_courses_ASD[, -1])
+
+behaviourals_ASD$BrainSeg <- behaviourals_all$BrainSeg[match(behaviourals_ASD$SUB_ID, behaviourals_all$SUB_ID)]
+stopifnot(!any(is.na(behaviourals_ASD$BrainSeg)))
+```
+
+## Between group: IQ as a covariate ##
+```{r}
+# IQ
+y  <- subject_courses_tp[, 37]
+x  <- as.factor(behaviourals_all$DX_GROUP)
+z  <- as.factor(behaviourals_all$SEX)
+c1 <- behaviourals_all$AGE_AT_SCAN
+c2 <- as.factor(behaviourals_all$SITE_ID)
+
+ols_iq <- lm(y ~ x + z + c1 + c2 + behaviourals_all$FIQ)       # participants with missing FIQ are dropped
+ols_bs <- lm(y ~ x + z + c1 + c2 + behaviourals_all$BrainSeg)
+
+cat("IC37 controlling for IQ:   t =", round(summary(ols_iq)$coefficients["x2", "t value"], 2),
+    "| df =", ols_iq$df.residual, "| p =", signif(summary(ols_iq)$coefficients["x2", "Pr(>|t|)"], 3),
+    "| N =", nobs(ols_iq), "\n")
+cat("IC37 controlling for TBV:  t =", round(summary(ols_bs)$coefficients["x2", "t value"], 2),
+    "| df =", ols_bs$df.residual, "| p =", signif(summary(ols_bs)$coefficients["x2", "Pr(>|t|)"], 3),
+    "| N =", nobs(ols_bs), "\n")
+
+```
+
+## Symptom Associations: FIQ ant TBV as covariates ##
+```{r}
+y  <- subject_courses_ASD_matrix[, 1]
+c1 <- behaviourals_ASD$AGE_AT_SCAN
+c2 <- as.factor(behaviourals_ASD$SEX)
+c3 <- as.factor(behaviourals_ASD$SITE_ID)
+
+ols_total_iq <- lm(y ~ behaviourals_ASD$ADOS_2_total_gotham_harmonized + c1 + c2 + c3 + behaviourals_ASD$FIQ)
+ols_css_iq   <- lm(y ~ behaviourals_ASD$ADOS_2_severity_harmonized     + c1 + c2 + c3 + behaviourals_ASD$FIQ)
+ols_total_bs <- lm(y ~ behaviourals_ASD$ADOS_2_total_gotham_harmonized + c1 + c2 + c3 + behaviourals_ASD$BrainSeg)
+ols_css_bs   <- lm(y ~ behaviourals_ASD$ADOS_2_severity_harmonized     + c1 + c2 + c3 + behaviourals_ASD$BrainSeg)
+
+# p-values (row 2 = the ADOS score) and FDR across the two associations per covariate
+p_iq   <- c(summary(ols_total_iq)$coefficients[2, "Pr(>|t|)"], summary(ols_css_iq)$coefficients[2, "Pr(>|t|)"])
+p_bs   <- c(summary(ols_total_bs)$coefficients[2, "Pr(>|t|)"], summary(ols_css_bs)$coefficients[2, "Pr(>|t|)"])
+pfdr_iq <- p.adjust(p_iq, method = "BH")
+pfdr_bs <- p.adjust(p_bs, method = "BH")
+
+cat("IC1 ADOS total controlling for IQ:   t =", round(summary(ols_total_iq)$coefficients[2, "t value"], 2),
+    "| df =", ols_total_iq$df.residual, "| p =", signif(p_iq[1], 3), "| p_FDR =", signif(pfdr_iq[1], 3),
+    "| N =", nobs(ols_total_iq), "\n")
+cat("IC1 ADOS CSS controlling for IQ:     t =", round(summary(ols_css_iq)$coefficients[2, "t value"], 2),
+    "| df =", ols_css_iq$df.residual, "| p =", signif(p_iq[2], 3), "| p_FDR =", signif(pfdr_iq[2], 3),
+    "| N =", nobs(ols_css_iq), "\n")
+cat("IC1 ADOS total controlling for TBV:  t =", round(summary(ols_total_bs)$coefficients[2, "t value"], 2),
+    "| df =", ols_total_bs$df.residual, "| p =", signif(p_bs[1], 3), "| p_FDR =", signif(pfdr_bs[1], 3),
+    "| N =", nobs(ols_total_bs), "\n")
+cat("IC1 ADOS CSS controlling for TBV:    t =", round(summary(ols_css_bs)$coefficients[2, "t value"], 2),
+    "| df =", ols_css_bs$df.residual, "| p =", signif(p_bs[2], 3), "| p_FDR =", signif(pfdr_bs[2], 3),
+    "| N =", nobs(ols_css_bs), "\n")
+```
+
+
+## sex x diagnosis x age ##
+```{r}
+ICs <- ncol(subject_courses_tp)
+pvals_3way <- matrix(NA, nrow=ICs, ncol=1)
+fvals_3way <- matrix(NA, nrow=ICs, ncol=1)
+
+# loop over ICs
+for (i in 1:ICs){
+  y <- subject_courses_tp[,i]
+  x <- as.factor(behaviourals_all$DX_GROUP) #because categorical
+  z <- as.factor(behaviourals_all$SEX) #because categorical
+  c1 <- behaviourals_all$AGE_AT_SCAN #continuous
+  c2 <- as.factor(behaviourals_all$SITE_ID) #because categorical
+
+  ols <- lm(y ~ x*z*c1 + c2)
+  aov3 <- Anova(ols, type="III")
+
+  pvals_3way[i,1] <- aov3["x:z:c1", "Pr(>F)"]
+  fvals_3way[i,1] <- aov3["x:z:c1", "F value"]
+}
+
+#FDR correction
+pvals_3way_fdr <- p.adjust(pvals_3way[,1], method="BH")
+
+# 3-way interaction
+sig_3way <- which(pvals_3way_fdr < 0.05)
+if(length(sig_3way) > 0) {
+  cat("Sex x Diagnosis x Age - significant ICs:", paste0("IC", sig_3way), "\n")
+} else {
+  cat("No significant sex x diagnosis x age interactions\n")
+}
+
+# values for the write-up (df is correct here: this is the same model)
+cat("N:", nobs(ols), "| df:", ols$df.residual, "\n")
+cat("Smallest p_FDR:", min(pvals_3way_fdr), "at", paste0("IC", which.min(pvals_3way_fdr)),
+    "| F:", fvals_3way[which.min(pvals_3way_fdr), 1], "\n")
+```
+
+
+

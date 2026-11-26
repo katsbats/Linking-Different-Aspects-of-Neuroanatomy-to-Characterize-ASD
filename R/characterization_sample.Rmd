@@ -1,0 +1,224 @@
+---
+title: "Characterization of Demographics"
+author: "Katharina Bremer"
+date: "2026-11-02"
+output: html_document
+---
+
+# Packages
+```{r packages}
+library(readr)
+library(dplyr)
+library(psych)
+library(tidyr)
+```
+
+## Harmonise the clinical variables of ABIDE I and II
+```{r}
+# Final sample (the one used for FLICA)
+ABIDEall_pheno_filtered <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter.csv')
+
+# Group label (diagnosis x sex)
+ABIDEall_pheno_filtered$Group <- with(
+  ABIDEall_pheno_filtered,
+  case_when(
+    DX_GROUP == 1 & SEX == 1 ~ "Autism male",
+    DX_GROUP == 1 & SEX == 2 ~ "Autism female",
+    DX_GROUP == 2 & SEX == 1 ~ "Control male",
+    DX_GROUP == 2 & SEX == 2 ~ "Control female"
+  )
+)
+
+# ABIDE I and II use different column names for the same measures (ABIDE phenotypic legend):
+#   ABIDE II               ABIDE I
+#   ADOS_G_TOTAL           ADOS_TOTAL
+#   ADOS_G_COMM            ADOS_COMM
+#   ADOS_G_SOCIAL          ADOS_SOCIAL
+#   ADOS_G_STEREO_BEHAV    ADOS_STEREO_BEHAV
+#   ADOS_2_SOCAFFECT       ADOS_GOTHAM_SOCAFFECT
+#   ADOS_2_RRB             ADOS_GOTHAM_RRB
+#   ADOS_2_TOTAL           ADOS_GOTHAM_TOTAL
+#   ADOS_2_SEVERITY_TOTAL  ADOS_GOTHAM_SEVERITY
+#   ADI_R_RRB_TOTAL_C      ADI_RRB_TOTAL_C
+#   SRS_TOTAL_RAW          SRS_RAW_TOTAL
+#   SRS_AWARENESS_RAW      SRS_AWARENESS
+#   SRS_COGNITION_RAW      SRS_COGNITION
+#   SRS_COMMUNICATION_RAW  SRS_COMMUNICATION
+#   SRS_MOTIVATION_RAW     SRS_MOTIVATION
+#   SRS_MANNERISMS_RAW     SRS_MANNERISMS
+# -> combine each pair into one "_harmonized" column and drop the originals
+
+ABIDEall_pheno_filtered <- ABIDEall_pheno_filtered %>%
+  mutate(
+    ADOS_G_total_harmonized        = case_when(dataset == "ABIDE1" ~ ADOS_TOTAL,            dataset == "ABIDE2" ~ ADOS_G_TOTAL),
+    ADOS_G_comm_harmonized         = case_when(dataset == "ABIDE1" ~ ADOS_COMM,             dataset == "ABIDE2" ~ ADOS_G_COMM),
+    ADOS_G_social_harmonized       = case_when(dataset == "ABIDE1" ~ ADOS_SOCIAL,           dataset == "ABIDE2" ~ ADOS_G_SOCIAL),
+    ADOS_G_stereo_behav_harmonized = case_when(dataset == "ABIDE1" ~ ADOS_STEREO_BEHAV,     dataset == "ABIDE2" ~ ADOS_G_STEREO_BEHAV),
+    ADOS_2_socaff_harmonized       = case_when(dataset == "ABIDE1" ~ ADOS_GOTHAM_SOCAFFECT, dataset == "ABIDE2" ~ ADOS_2_SOCAFFECT),
+    ADOS_2_rrb_harmonized          = case_when(dataset == "ABIDE1" ~ ADOS_GOTHAM_RRB,       dataset == "ABIDE2" ~ ADOS_2_RRB),
+    ADOS_2_total_gotham_harmonized = case_when(dataset == "ABIDE1" ~ ADOS_GOTHAM_TOTAL,     dataset == "ABIDE2" ~ ADOS_2_TOTAL),
+    ADOS_2_severity_harmonized     = case_when(dataset == "ABIDE1" ~ ADOS_GOTHAM_SEVERITY,  dataset == "ABIDE2" ~ ADOS_2_SEVERITY_TOTAL),
+    ADI_RRB_harmonized             = case_when(dataset == "ABIDE1" ~ ADI_RRB_TOTAL_C,       dataset == "ABIDE2" ~ ADI_R_RRB_TOTAL_C),
+    SRS_TOTAL_harmonized           = case_when(dataset == "ABIDE1" ~ SRS_RAW_TOTAL,         dataset == "ABIDE2" ~ SRS_TOTAL_RAW),
+    SRS_AWARENESS_harmonized       = case_when(dataset == "ABIDE1" ~ SRS_AWARENESS,         dataset == "ABIDE2" ~ SRS_AWARENESS_RAW),
+    SRS_COGNITION_harmonized       = case_when(dataset == "ABIDE1" ~ SRS_COGNITION,         dataset == "ABIDE2" ~ SRS_COGNITION_RAW),
+    SRS_COMMUNICATION_harmonized   = case_when(dataset == "ABIDE1" ~ SRS_COMMUNICATION,     dataset == "ABIDE2" ~ SRS_COMMUNICATION_RAW),
+    SRS_MOTIVATION_harmonized      = case_when(dataset == "ABIDE1" ~ SRS_MOTIVATION,        dataset == "ABIDE2" ~ SRS_MOTIVATION_RAW),
+    SRS_MANNERISMS_harmonized      = case_when(dataset == "ABIDE1" ~ SRS_MANNERISMS,        dataset == "ABIDE2" ~ SRS_MANNERISMS_RAW)
+  ) %>%
+  select(-c(
+    ADOS_TOTAL, ADOS_COMM, ADOS_SOCIAL, ADOS_STEREO_BEHAV,                                  # ABIDE I
+    ADOS_G_TOTAL, ADOS_G_COMM, ADOS_G_SOCIAL, ADOS_G_STEREO_BEHAV,                          # ABIDE II
+    ADOS_GOTHAM_SOCAFFECT, ADOS_GOTHAM_RRB, ADOS_GOTHAM_TOTAL, ADOS_GOTHAM_SEVERITY,        # ABIDE I
+    ADOS_2_SOCAFFECT, ADOS_2_RRB, ADOS_2_TOTAL, ADOS_2_SEVERITY_TOTAL,                      # ABIDE II
+    ADI_RRB_TOTAL_C, ADI_R_RRB_TOTAL_C,                                                     # ABIDE I / II
+    SRS_RAW_TOTAL, SRS_AWARENESS, SRS_COGNITION, SRS_COMMUNICATION,
+    SRS_MOTIVATION, SRS_MANNERISMS,                                                         # ABIDE I
+    SRS_TOTAL_RAW, SRS_AWARENESS_RAW, SRS_COGNITION_RAW, SRS_COMMUNICATION_RAW,
+    SRS_MOTIVATION_RAW, SRS_MANNERISMS_RAW                                                  # ABIDE II
+  ))
+
+# Number of participants with data per measure and dataset
+ABIDEall_pheno_filtered %>%
+  group_by(dataset) %>%
+  summarise(across(ends_with("_harmonized"), ~ sum(!is.na(.x))))
+
+write_csv(ABIDEall_pheno_filtered,
+           '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter_cleaned.csv')
+```
+
+
+## Group comparisons (age, IQ, sex ratio)
+```{r }
+# Final sample
+dat <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter.csv') %>%
+  mutate(across(c(AGE_AT_SCAN, FIQ, VIQ, PIQ), ~ na_if(.x, -9999)),  # safety check for missing-value codes
+         Group = factor(case_when(
+           DX_GROUP == 1 & SEX == 1 ~ "Autistic males",
+           DX_GROUP == 1 & SEX == 2 ~ "Autistic females",
+           DX_GROUP == 2 & SEX == 1 ~ "NAI males",
+           DX_GROUP == 2 & SEX == 2 ~ "NAI females"),
+           levels = c("Autistic males", "Autistic females", "NAI males", "NAI females")))
+
+nrow(dat)  # 955
+
+vars <- c(AGE_AT_SCAN = "Age (years)", FIQ = "Full-scale IQ",
+          VIQ = "Verbal IQ", PIQ = "Performance IQ")
+
+
+# M (SD) per group
+desc <- dat %>%
+  pivot_longer(all_of(names(vars)), names_to = "var", values_to = "val") %>%               # long format > one row per variable
+  group_by(var, Group) %>%                                                                 # one group per variable x diagnosis-by-sex group
+  summarise(cell = sprintf("%.2f (%.2f)", mean(val, na.rm = TRUE), sd(val, na.rm = TRUE)), # mean and SD per group
+            .groups = "drop") %>%
+  pivot_wider(names_from = Group, values_from = cell)                                      # back to wide format: one row per variable, one column per group
+
+
+# Welch's ANOVAs and chi-squared test 
+w_age <- oneway.test(AGE_AT_SCAN ~ Group, data = dat, var.equal = FALSE)
+w_fiq <- oneway.test(FIQ ~ Group,         data = dat, var.equal = FALSE)
+w_viq <- oneway.test(VIQ ~ Group,         data = dat, var.equal = FALSE)
+w_piq <- oneway.test(PIQ ~ Group,         data = dat, var.equal = FALSE)
+chi   <- chisq.test(table(dat$DX_GROUP, dat$SEX))
+
+tests <- data.frame(
+  test      = c("Welch ANOVA: Age", "Welch ANOVA: FIQ", "Welch ANOVA: VIQ", "Welch ANOVA: PIQ", "Chi-squared: sex ratio"),
+  statistic = round(c(w_age$statistic, w_fiq$statistic, w_viq$statistic, w_piq$statistic, chi$statistic), 2),
+  df1       = c(w_age$parameter[1], w_fiq$parameter[1], w_viq$parameter[1], w_piq$parameter[1], chi$parameter),
+  df2       = round(c(w_age$parameter[2], w_fiq$parameter[2], w_viq$parameter[2], w_piq$parameter[2], NA), 2),
+  p         = signif(c(w_age$p.value, w_fiq$p.value, w_viq$p.value, w_piq$p.value, chi$p.value), 3)
+)
+tests
+
+write.csv(tests, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Table_E1_tests.csv', row.names = FALSE)
+
+# Save M (SD) table
+write.csv(desc, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Table_E1_descriptives.csv', row.names = FALSE)
+
+table(dat$Group) 
+```
+
+## Sex differences in IQ within each diagnostic group (Welch's t-tests)
+```{r}
+#Test whether males and females differ in IQ within each diagnostic group
+# Split the sample into the two diagnostic groups
+ASD <- filter(dat, DX_GROUP == 1)   # autistic participants
+nai <- filter(dat, DX_GROUP == 2)   # NAI
+
+# Compare males and females on FIQ, VIQ and PIQ within each group
+# (t.test uses Welch's correction by default)
+t_fiq_ASD <- t.test(FIQ ~ SEX, data = ASD)
+t_viq_ASD <- t.test(VIQ ~ SEX, data = ASD)
+t_piq_ASD <- t.test(PIQ ~ SEX, data = ASD)
+t_fiq_nai <- t.test(FIQ ~ SEX, data = nai)
+t_viq_nai <- t.test(VIQ ~ SEX, data = nai)
+t_piq_nai <- t.test(PIQ ~ SEX, data = nai)
+
+# Put the results in one table
+t_tests <- data.frame(
+  test = c("FIQ autism", "VIQ autism", "PIQ autism", "FIQ NAI", "VIQ NAI", "PIQ NAI"),
+  t    = c(t_fiq_ASD$statistic, t_viq_ASD$statistic, t_piq_ASD$statistic,
+           t_fiq_nai$statistic, t_viq_nai$statistic, t_piq_nai$statistic),
+  df   = c(t_fiq_ASD$parameter, t_viq_ASD$parameter, t_piq_ASD$parameter,
+           t_fiq_nai$parameter, t_viq_nai$parameter, t_piq_nai$parameter),
+  p    = c(t_fiq_ASD$p.value, t_viq_ASD$p.value, t_piq_ASD$p.value,
+           t_fiq_nai$p.value, t_viq_nai$p.value, t_piq_nai$p.value)
+)
+t_tests
+
+write.csv(t_tests, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/IQ_sex_differences_ttests.csv', row.names = FALSE)
+```
+
+
+## Supplementary tables ##
+```{r}
+
+## Table 1: Data per site 
+# Cleaned phenotypic data 
+d <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter_cleaned.csv')
+
+# One row per site: number of participants per group, and age
+site_tab <- d %>%
+  group_by(SITE_ID) %>%
+  summarise(autism_male   = sum(DX_GROUP == 1 & SEX == 1),
+            autism_female = sum(DX_GROUP == 1 & SEX == 2),
+            nai_male      = sum(DX_GROUP == 2 & SEX == 1),
+            nai_female    = sum(DX_GROUP == 2 & SEX == 2),
+            total         = n(),
+            age_mean      = mean(AGE_AT_SCAN),
+            age_sd        = sd(AGE_AT_SCAN),
+            age_min       = min(AGE_AT_SCAN),
+            age_max       = max(AGE_AT_SCAN))
+site_tab
+
+write.csv(site_tab, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Table_sites.csv', row.names = FALSE)
+
+## Table 2: Clinical scores of ASD group 
+clin_vars <- c("ADI_R_SOCIAL_TOTAL_A", "ADI_R_VERBAL_TOTAL_BV", "ADI_RRB_harmonized",
+               "ADOS_G_total_harmonized", "ADOS_G_comm_harmonized", "ADOS_G_social_harmonized",
+               "ADOS_2_total_gotham_harmonized", "ADOS_2_socaff_harmonized", "ADOS_2_rrb_harmonized",
+               "ADOS_2_severity_harmonized", "SRS_TOTAL_harmonized", "SRS_AWARENESS_harmonized",
+               "SRS_COGNITION_harmonized", "SRS_COMMUNICATION_harmonized", "SRS_MOTIVATION_harmonized")
+
+# Autistic males and autistic females
+aut_male   <- filter(d, DX_GROUP == 1, SEX == 1)
+aut_female <- filter(d, DX_GROUP == 1, SEX == 2)
+
+# Descriptives (n, mean, SD, min, max) for each measure
+desc_male   <- describe(aut_male[, clin_vars])
+desc_female <- describe(aut_female[, clin_vars])
+
+write.csv(desc_male,   '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Table_clinical_males.csv')
+write.csv(desc_female, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Table_clinical_females.csv')
+
+# Wilcox (males vs. females) for each measure
+wilcox_results <- data.frame()
+for (v in clin_vars) {
+  w <- wilcox.test(aut_male[[v]], aut_female[[v]], exact = FALSE)
+  wilcox_results <- rbind(wilcox_results, data.frame(measure = v, W = w$statistic, p = w$p.value))
+}
+wilcox_results
+
+write.csv(wilcox_results, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Table_clinical_wilcoxon.csv', row.names = FALSE)
+```

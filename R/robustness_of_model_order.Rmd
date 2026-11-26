@@ -1,0 +1,147 @@
+---
+title: "Robustness of model order"
+author: "Katharina Bremer"
+date: "2026-11-02"
+output: html_document
+---
+
+# FSL Sensitivity Analysis
+```{r}
+library(corrplot)
+library(RcppHungarian)
+```
+
+
+### Load 160, 150, 140 versions ###
+```{r}
+subject_courses_150 <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/150ica_secondfilter/subjectCoursesOut.txt')
+subject_courses_140 <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/140ica_secondfilter/subjectCoursesOut.txt')
+subject_courses_160 <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/160ica_secondfilter/subjectCoursesOut.txt')
+
+subject_courses_tp_150 <- t(subject_courses_150)
+subject_courses_tp_140 <- t(subject_courses_140)
+subject_courses_tp_160 <- t(subject_courses_160)
+
+# Remove zero columns
+subject_courses_tp_150 <- subject_courses_tp_150[, colSums(subject_courses_tp_150 == 0) != nrow(subject_courses_tp_150)]
+subject_courses_tp_140 <- subject_courses_tp_140[, colSums(subject_courses_tp_140 == 0) != nrow(subject_courses_tp_140)]
+subject_courses_tp_160 <- subject_courses_tp_160[, colSums(subject_courses_tp_160 == 0) != nrow(subject_courses_tp_160)]
+
+# Correlate subject courses between the two versions
+cor_matrix140 <- cor(subject_courses_tp_150, subject_courses_tp_140)
+cor_matrix160 <- cor(subject_courses_tp_150, subject_courses_tp_160)
+```
+
+# Hungarian plot
+```{r}
+# if the order is different then the diagonal wont be great -> this is why we use hungarian method. 
+# We want max correlation not min cost so we flip it (min cost = high correlation and so on) 
+
+# 140
+cost_matrix140 <- 1 - abs(cor_matrix140)
+result <- HungarianSolver(cost_matrix140) # This finds the one-to-one pairing (lowest cost / highest correlation)
+
+# result$pairs is a 2-column matrix: [150-IC solution, 140-IC solution]
+pairs <- result$pairs                     # Tells us which ICs are best matched
+valid <- pairs[, 2] > 0                   # Removes columns with a 0 (because 150 has more ICs than 140)
+pairs <- pairs[valid, , drop = FALSE]
+
+match_table <- data.frame(                # A table of each matched pair and its correlation
+  ICS_150 = pairs[, 1],
+  IC_140 = pairs[, 2],
+  correlation = sapply(1:nrow(pairs), function(i) cor_matrix140[pairs[i, 1], pairs[i, 2]])
+)
+
+# Correlation plot with strong correlations on the diagonal
+cor_matrix_matched <- cor_matrix140[pairs[, 1], pairs[, 2]]
+
+
+# 160
+cost_matrix160 <- 1 - abs(cor_matrix160)
+result160 <- HungarianSolver(cost_matrix160)
+pairs160 <- result160$pairs
+valid160 <- pairs160[, 2] > 0
+pairs160 <- pairs160[valid160, , drop = FALSE]
+
+match_table160 <- data.frame(
+  IC_150 = pairs160[, 1],
+  IC_160 = pairs160[, 2],
+  correlation = sapply(1:nrow(pairs160), function(i) cor_matrix160[pairs160[i, 1], pairs160[i, 2]])
+)
+
+cor_matrix_matched160 <- cor_matrix160[pairs160[, 1], pairs160[, 2]]
+``` 
+
+# Sorted absolute correlation profiles (spaghetti plot)
+```{r}
+n150 <- ncol(subject_courses_tp_150)
+n140 <- ncol(subject_courses_tp_140)
+n160 <- ncol(subject_courses_tp_160)
+
+ic_of_interest <- 37  # the significant IC
+
+png('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/Asorted_correlation_profiles.png',
+    width = 16, height = 7, units = "cm", res = 300)
+par(mfrow = c(1, 2), mar = c(3.5, 3.5, 1.5, 0.5), mgp = c(2.2, 0.6, 0),
+    cex = 0.7, tcl = -0.3, las = 1, bty = "l")
+
+# 140
+plot(NULL, xlim = c(1, n140), ylim = c(0, 1), xaxt = "n",
+     xlab = "Components of 140-IC solution (sorted)",
+     ylab = "Absolute correlation")
+axis(1, at = seq(0, 140, 20))
+
+for (i in 1:n150) {
+  if (i == ic_of_interest) next
+  vals <- sort(abs(cor_matrix140[i, ]), decreasing = TRUE)
+  lines(vals, col = rgb(0.6, 0.6, 0.6, 0.3), lwd = 0.8)
+}
+vals <- sort(abs(cor_matrix140[ic_of_interest, ]), decreasing = TRUE)
+lines(vals, col = "black", lwd = 2, lty = 2)
+
+# 160
+plot(NULL, xlim = c(1, n160), ylim = c(0, 1), xaxt = "n",
+     xlab = "Components of 160-IC solution (sorted)",
+     ylab = "Absolute correlation")
+axis(1, at = seq(0, 160, 20))
+
+for (i in 1:n150) {
+  if (i == ic_of_interest) next
+  vals <- sort(abs(cor_matrix160[i, ]), decreasing = TRUE)
+  lines(vals, col = rgb(0.6, 0.6, 0.6, 0.3), lwd = 0.8)
+}
+vals <- sort(abs(cor_matrix160[ic_of_interest, ]), decreasing = TRUE)
+lines(vals, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("IC37", "Other ICs"),
+       col = c("black", "grey60"), lty = c(2, 1), lwd = c(2, 1), bty = "n")
+dev.off()
+
+#Good robustness = Most lines start high on the left (r ≈ 0.8–1.0) and drop sharply. This means the IC has one strong counterpart in the other decomposition and doesn't correlate much with anything else. 
+
+match_table[match_table$ICS_150 == 37, ]
+match_table160[match_table160$IC_150 == 37, ]
+
+summary(abs(match_table$correlation))
+summary(abs(match_table160$correlation))
+```
+
+
+# For thesis
+```{r}
+png('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/correlation_hungarian_150vs140_160_FSL.png',
+    width = 1600, height = 800, res = 150)
+par(mfrow = c(1, 2))
+
+corrplot(cor_matrix_matched, method = "color", tl.pos = "n",
+         col.lim = c(-1, 1), cl.cex = 0.7,
+         title = "150 vs 140 ICs (Hungarian matched)",
+         mar = c(0, 0, 2, 0))
+
+corrplot(cor_matrix_matched160, method = "color", tl.pos = "n",
+         col.lim = c(-1, 1), cl.cex = 0.7,
+         title = "150 vs 160 ICs (Hungarian matched)",
+         mar = c(0, 0, 2, 0))
+
+dev.off()
+```
