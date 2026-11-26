@@ -9,7 +9,7 @@ paths = fullfile({xmlFiles.folder}, {xmlFiles.name});
 [~, idx] = sort(lower(paths));
 xmlFiles = xmlFiles(idx);
 
-n = numel(xmlFiles); %had to do this so that the data structure matches that of the pheno data
+n = numel(xmlFiles); % had to do this so that the data structure matches that of the pheno data
 Site   = strings(n,1);
 SUB_ID = strings(n,1);
 IQR = zeros(n,1);
@@ -31,7 +31,7 @@ for i = 1:n
     try
         IQR(i) = str2double(xmlread(f).getElementsByTagName('IQR').item(0).getTextContent);
     catch
-        IQR(i) = NaN; %added because code didnt run fully, meaning not all subjects have a IQR
+        IQR(i) = NaN; % added this because code didnt run fully, meaning not all subjects have a IQR
     end
 
 end
