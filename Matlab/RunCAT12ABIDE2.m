@@ -13,7 +13,7 @@ end
 load(jobfile, 'matlabbatch');
 
 addpath(fullfile(prefix, 'Students', 'Katharina_Bremer', 'Scripts', 'Matlab', 'matlab_installation', 'spm'));
-spm('defaults','fmri');
+spm('defaults','PET');
 spm_jobman('initcfg');
 addpath(fullfile(prefix, 'Students', 'Katharina_Bremer', 'Scripts', 'Matlab', 'matlab_installation', 'spm','toolbox','cat12'));
 
