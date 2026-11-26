@@ -1,4 +1,4 @@
-%%%toolkit: https://mlnl.github.io/cca_pls_toolkit/ 
+%%% Uses PLS toolkit (See README)
 %%this script should be in a folder called "pls_analysis"
 %%%in this folder you also need to create a folder called  "data" with X -> behavioral var and Y -> brain var.
 
