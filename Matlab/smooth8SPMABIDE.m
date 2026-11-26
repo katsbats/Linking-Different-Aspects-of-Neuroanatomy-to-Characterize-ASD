@@ -4,11 +4,11 @@ s_cloud = 1;
 if s_cloud == 1
     prefix = fullfile(filesep, 'mnt', 'methlab-drive','methlab');
     jobfile = fullfile(prefix, 'Students','Katharina_Bremer','Scripts','Matlab', ...
-                       'SPM','SmoothABIDEs8.mat');
+                       'SPM','smoothABIDEs8.mat');
 else
     prefix = fullfile(filesep, 'Volumes','g_psyplafor_methlab$');
     jobfile = fullfile(prefix, 'Students','Katharina_Bremer','Scripts','Matlab', ...
-                       'SPM','SmoothABIDEs8.mat');
+                       'SPM','smoothABIDEs8.mat');
 end
 
 load(jobfile, 'matlabbatch');
