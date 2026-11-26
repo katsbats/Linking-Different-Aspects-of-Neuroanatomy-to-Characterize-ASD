@@ -1,4 +1,4 @@
-%defining my directory
+% defining my directory
 rootDir = '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Input/ABIDE_I';
 
 % finding the xmlfiles per subject
