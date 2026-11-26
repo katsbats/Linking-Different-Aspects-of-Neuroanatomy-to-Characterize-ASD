@@ -31,7 +31,7 @@ cfg = cfg_defaults(cfg);
 % Run analysis
 main(cfg);
 
-%% Load data and PLS weights
+%% Load data and PLS weights 
 res_folder = fullfile(cfg.dir.project, 'framework/pls_permutation/res/level1');
 
 load(fullfile(cfg.dir.project, 'data', 'X.mat'), 'X');   % 405 x 8 clinical
@@ -39,7 +39,7 @@ load(fullfile(cfg.dir.project, 'data', 'Y.mat'), 'Y');   % 405 x 150 brain
 load(fullfile(res_folder, 'model_1.mat'), 'wX', 'wY');   % saliences from the toolkit
 wX = wX(:);  wY = wY(:);
 
-%% 
+%% Looking at results
 X_labels = {'ADOS2_severity','ADI_R_SOCIAL_A','ADOS2_rrb','ADOS2_total_gotham', ...
             'ADOS2_socaff','ADI_R_VERBAL_BV','ADI_RRB','ADI_R_NONVERBAL_BV'};
 
@@ -59,9 +59,9 @@ end
 Xz = zscore(X);
 Yz = zscore(Y);
 u = Xz*wX(:);  v = Yz*wY(:);
-fprintf('latent r = %.4f  (expect 0.567)\n', corr(u,v));
+fprintf('\latent r = %.4f\n', corr(u,v));
 
-%% Haufe loadings 
+%% Creating Haufe loadings 
 a_X = corr(Xz, u, 'rows','pairwise');
 a_Y = corr(Yz, v, 'rows','pairwise');
 
@@ -69,17 +69,17 @@ a_Y = corr(Yz, v, 'rows','pairwise');
 %% Bootstrap 
 n_boot = 1000;
 n_subj = size(Xz,1);
-boot_wX = zeros(n_boot, size(Xz,2));
+boot_wX = zeros(n_boot, size(Xz,2)); % create empty tables
 boot_wY = zeros(n_boot, size(Yz,2));
 
-rng(1);
+rng(1); % seed is fixed 
 for b = 1:n_boot
-    idx = randi(n_subj, n_subj, 1);
-    Xb = zscore(X(idx,:));      % re-standardize within the resample
+    idx = randi(n_subj, n_subj, 1); % draws sample with replacement
+    Xb = zscore(X(idx,:));          % re-standardize within the resample
     Yb = zscore(Y(idx,:));
 
-    C = Xb' * Yb;               
-    [U,~,V] = svd(C,'econ');
+    C = Xb' * Yb;               % cross covariance matrix
+    [U,~,V] = svd(C,'econ');    % PLS
     wXb = U(:,1);
     wYb = V(:,1);
 
@@ -91,14 +91,14 @@ for b = 1:n_boot
     boot_wY(b,:) = wYb;
 end
 
-%% BSR 
-bsr_X = wX ./ std(boot_wX)';
+%% Bootstrap ratio (SR) 
+bsr_X = wX ./ std(boot_wX)'; % original weight / how much it varied during the bootstrapping
 bsr_Y = wY ./ std(boot_wY)';
 
 fprintf('\nreliable clinical: %d of %d\n', sum(abs(bsr_X)>2), numel(bsr_X));
 fprintf('reliable brain ICs: %d of %d  (chance ~7)\n', sum(abs(bsr_Y)>2), numel(bsr_Y));
 
-%%
+%% Running the bootstrapping over different seeds (seeds 1:5)
 n_boot = 1000;
 n_subj = size(X,1);
 
@@ -127,7 +127,8 @@ for s = 1:5
     fprintf('seed %d: %d clinical, %d brain, max|BSR_Y| = %.4f\n', ...
             s, sum(abs(bsr_X_s)>2), sum(abs(bsr_Y_s)>2), max(abs(bsr_Y_s)));
 end
-%% Save
+
+%% Saving the results
 T_clin = table(X_labels', wX, a_X, bsr_X, ...
     'VariableNames',{'Variable','Salience','HaufeLoading','BSR'});
 writetable(T_clin, fullfile(res_folder,'bootstrap_clinical_final.csv'));
