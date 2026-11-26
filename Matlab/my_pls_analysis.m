@@ -1,6 +1,6 @@
 %%% Uses PLS toolkit (See README)
 %%this script should be in a folder called "pls_analysis"
-%%%in this folder you also need to create a folder called  "data" with X -> behavioral var and Y -> brain var.
+%%%in this folder you also need to create a folder called  "data" with X -> behavioral var and Y -> brain var (created by preparing_data_PLS.m)
 
 %%%%%
 % Add toolkit to path
@@ -39,27 +39,11 @@ load(fullfile(cfg.dir.project, 'data', 'Y.mat'), 'Y');   % 405 x 150 brain
 load(fullfile(res_folder, 'model_1.mat'), 'wX', 'wY');   % saliences from the toolkit
 wX = wX(:);  wY = wY(:);
 
-%% Looking at results
-X_labels = {'ADOS2_severity','ADI_R_SOCIAL_A','ADOS2_rrb','ADOS2_total_gotham', ...
-            'ADOS2_socaff','ADI_R_VERBAL_BV','ADI_RRB','ADI_R_NONVERBAL_BV'};
-
-% Clinical weights
-for i = 1:8
-    fprintf('%s: %.4f\n', X_labels{i}, wX(i));
-end
-
-% Top brain ICs by weight
-[~, sortIdx] = sort(abs(wY), 'descend');
-fprintf('\nTop brain ICs:\n');
-for k = 1:5
-    fprintf('IC%02d: %.4f\n', sortIdx(k), wY(sortIdx(k)));
-end
-
+X_labels = {'ADOS2_severity','ADI_R_SOCIAL_A','ADOS2_rrb','ADOS2_total_gotham','ADOS2_socaff','ADI_R_VERBAL_BV','ADI_RRB','ADI_R_NONVERBAL_BV'};
 
 Xz = zscore(X);
 Yz = zscore(Y);
 u = Xz*wX(:);  v = Yz*wY(:);
-fprintf('\latent r = %.4f\n', corr(u,v));
 
 %% Creating Haufe loadings 
 a_X = corr(Xz, u, 'rows','pairwise');
@@ -91,7 +75,7 @@ for b = 1:n_boot
     boot_wY(b,:) = wYb;
 end
 
-%% Bootstrap ratio (SR) 
+%% Bootstrap ratio (BSR) 
 bsr_X = wX ./ std(boot_wX)'; % original weight / how much it varied during the bootstrapping
 bsr_Y = wY ./ std(boot_wY)';
 
@@ -124,8 +108,7 @@ for s = 1:5
     bsr_X_s = wX ./ std(boot_wX)';
     bsr_Y_s = wY ./ std(boot_wY)';
 
-    fprintf('seed %d: %d clinical, %d brain, max|BSR_Y| = %.4f\n', ...
-            s, sum(abs(bsr_X_s)>2), sum(abs(bsr_Y_s)>2), max(abs(bsr_Y_s)));
+    fprintf('seed %d: %d clinical, %d brain, max|BSR_Y| = %.4f\n', s, sum(abs(bsr_X_s)>2), sum(abs(bsr_Y_s)>2), max(abs(bsr_Y_s)));
 end
 
 %% Saving the results
@@ -134,7 +117,5 @@ T_clin = table(X_labels', wX, a_X, bsr_X, ...
 writetable(T_clin, fullfile(res_folder,'bootstrap_clinical_final.csv'));
 
 [~,si] = sort(abs(bsr_Y),'descend');
-T_brain = table(arrayfun(@(x)sprintf('IC%03d',x), si, 'UniformOutput',false), ...
-    wY(si), a_Y(si), bsr_Y(si), ...
-    'VariableNames',{'IC','Salience','HaufeLoading','BSR'});
+T_brain = table(arrayfun(@(x)sprintf('IC%03d',x), si, 'UniformOutput',false), wY(si), a_Y(si), bsr_Y(si), 'VariableNames',{'IC','Salience','HaufeLoading','BSR'});
 writetable(T_brain, fullfile(res_folder,'bootstrap_brain_ICs_final.csv'));
