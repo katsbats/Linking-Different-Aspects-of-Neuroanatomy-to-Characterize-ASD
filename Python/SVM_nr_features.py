@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 
-# SVM classification of autism vs. NAI from the most multimodal and most unimodal ICs, for 1 to 75 features
-# this script needs to be run over the server
-#
-# CHANGE (permutation test): instead of permuting the diagnostic labels, the cross-validated
-# scores of the multimodal and unimodal classifiers are pooled, shuffled and reassigned to the
-# two classifiers (approach of Floris et al., 2025). This tests whether multimodal components
-# classify better than unimodal ones, rather than whether the classifiers beat chance.
+# SVM classification of autism vs. NAI from the most multimodal and most unimodal ICs, for 1 to 75 features (approach of Floris et al., 2025)
 
 import numpy as np
 import pandas as pd
@@ -27,7 +21,7 @@ OUT_PNG = '/mnt/methlab-drive/methlab/Students/Katharina_Bremer/Output/Plots/SVM
 
 N_SPLITS = 10
 N_REPEATS = 100
-N_PERM = 1000          # cheap now: no refitting inside the permutation loop
+N_PERM = 1000          
 C_PARAM = 1.0
 N_MODALITIES = 4
 SEED_REF = 42
