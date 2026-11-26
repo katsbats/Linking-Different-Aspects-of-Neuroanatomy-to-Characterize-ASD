@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
  
-#SVM classification of autism vs. NAI from multimodal and unimodal ICs. An IC is unimodal if one modality contributes more than the threshold.
+#SVM classification of autism vs. NAI from multimodal and unimodal ICs. An IC is unimodal if one modality contributes more than the threshold. (approach of Floris et al., 2025)
 #this script needs to be run over the server
 
 import numpy as np
