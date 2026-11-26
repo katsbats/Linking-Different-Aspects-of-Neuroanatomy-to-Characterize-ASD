@@ -138,5 +138,3 @@ T_brain = table(arrayfun(@(x)sprintf('IC%03d',x), si, 'UniformOutput',false), ..
     wY(si), a_Y(si), bsr_Y(si), ...
     'VariableNames',{'IC','Salience','HaufeLoading','BSR'});
 writetable(T_brain, fullfile(res_folder,'bootstrap_brain_ICs_final.csv'));
-%%
-fprintf('%d clinical, %d brain below p=.05\n', sum(p_X<0.05), sum(p_Y<0.05));
