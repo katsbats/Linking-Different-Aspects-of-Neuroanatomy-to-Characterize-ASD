@@ -9,13 +9,16 @@ This repository contains all the scripts and data necessary to reproduce the res
 - Some of the final figures in the thesis were created manually with Affinity Designer, the rest are created with the scripts provided here.
 - Final tables in the thesis were adapted manually (APA7 formatting) from the .csv  files, which are created through the scripts provided here.
 
-### Required Toolboxes 
+### Required software and toolboxes
+#### Github repositories used
 - [LICA](https://github.com/allera/Llera_elife_2019_1)
 - [Imputation](https://github.com/allera/Imputation)
 - [PLS](https://github.com/MLNL/cca_pls_toolkit/tree/v1.0.0)
+- [QOALA-T](https://github.com/Qoala-T/QC)
+#### Other 
 - [CAT](https://neuro-jena.github.io/cat/#download) (the version 12.9, r2577 was used in this thesis) and [SPM](https://www.fil.ion.ucl.ac.uk/spm/docs/installation/) (the version 25.01.02 was used in this thesis)
 - [Freesurfer](https://surfer.nmr.mgh.harvard.edu/)
-- [QOALA-T](https://github.com/Qoala-T/QC)
+
 
 
 # To exactly reproduce the results, run the scripts in the following order:
