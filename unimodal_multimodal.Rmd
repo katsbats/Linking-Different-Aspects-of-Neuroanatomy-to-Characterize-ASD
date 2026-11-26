@@ -1,0 +1,104 @@
+---
+title: "unimodal vs multimodal"
+author: "Katharina Bremer"
+date: "2026-11-04"
+output: html_document
+---
+
+# Loading the data 
+```{r setup, include=FALSE}
+
+# load data CT
+## subject courses
+subject_courses_ct <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Unimodal/CT/subjectCoursesOut.txt')
+subject_courses_ct_tp <- t(subject_courses_ct)
+
+## remove all-zero components
+subject_courses_ct_tp <- subject_courses_ct_tp[, colSums(subject_courses_ct_tp == 0) != nrow(subject_courses_ct_tp)]
+ncol(t(subject_courses_ct))   # total components
+ncol(subject_courses_ct_tp)   
+
+# load data VBM
+## subject courses
+subject_courses_vbm <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Unimodal/VBM/subjectCoursesOut.txt')
+subject_courses_vbm_tp <- t(subject_courses_vbm)
+
+## remove all-zero components
+subject_courses_vbm_tp <- subject_courses_vbm_tp[, colSums(subject_courses_vbm_tp == 0) != nrow(subject_courses_vbm_tp)]
+ncol(t(subject_courses_vbm))   # total components
+ncol(subject_courses_vbm_tp)
+
+# load data JD
+## subject courses
+subject_courses_jd <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Unimodal/JD/subjectCoursesOut.txt')
+subject_courses_jd_tp <- t(subject_courses_jd)
+
+## remove all-zero components
+subject_courses_jd_tp <- subject_courses_jd_tp[, colSums(subject_courses_jd_tp == 0) != nrow(subject_courses_jd_tp)]
+ncol(t(subject_courses_jd))   # total components
+ncol(subject_courses_jd_tp)
+
+# load data PA (SA)
+## subject courses
+subject_courses_pa <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Unimodal/PA/subjectCoursesOut.txt')
+subject_courses_pa_tp <- t(subject_courses_pa)
+
+## remove all-zero components
+subject_courses_pa_tp <- subject_courses_pa_tp[, colSums(subject_courses_pa_tp == 0) != nrow(subject_courses_pa_tp)]
+ncol(t(subject_courses_pa))   # total components
+ncol(subject_courses_pa_tp)
+```
+
+# Correlations of unimodal components and IC37
+```{r}
+# phenotypic data (same subjects and order as the LICA input)
+behaviourals_all <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter.csv')
+stopifnot(nrow(subject_courses_vbm_tp) == nrow(behaviourals_all))
+
+x  <- as.factor(behaviourals_all$DX_GROUP) #because categorical
+z  <- as.factor(behaviourals_all$SEX) #because categorical
+c1 <- behaviourals_all$AGE_AT_SCAN #continuous
+c2 <- as.factor(behaviourals_all$SITE_ID) #because categorical
+
+# multimodal subject courses
+subject_courses_mm <- read.table('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_Format/150ica_secondfilter/subjectCoursesOut.txt')
+subject_courses_mm_tp <- t(subject_courses_mm)
+subject_courses_mm_tp <- subject_courses_mm_tp[, colSums(subject_courses_mm_tp == 0) != nrow(subject_courses_mm_tp)]
+
+# unimodal decompositions
+unimodal <- list(VBM = subject_courses_vbm_tp, JD = subject_courses_jd_tp,
+                 CT  = subject_courses_ct_tp,  SA = subject_courses_pa_tp)
+
+# unimodal IC most correlated with IC37
+for (mod in names(unimodal)) {
+  r <- abs(cor(subject_courses_mm_tp[, 37], unimodal[[mod]]))
+  cat(mod, ": max |r| =", round(max(r), 2), "at IC", which.max(r), "\n")
+}
+
+matched_IC <- c(VBM = 28, JD = 18, CT = 31, SA = 79)   # from the loop above
+
+# group differences in all unimodal ICs
+for (mod in names(unimodal)){
+  sc  <- unimodal[[mod]]                               # subject course
+  ICs <- ncol(sc)
+  pvals <- numeric(ICs)
+
+  # loop over ICs (same model as the main analysis)
+  for (i in 1:ICs){
+    y <- sc[, i]
+    ols <- lm(y ~ x + z + c1 + c2)
+    pvals[i] <- summary(ols)$coefficients["x2", "Pr(>|t|)"]
+  }
+
+  # FDR correction across all ICs of this decomposition
+  pvals_fdr <- p.adjust(pvals, method="BH")
+
+  sig <- which(pvals_fdr < 0.05)
+  if(length(sig) > 0) {
+    cat(mod, "- significant ICs:", sig, "\n")
+  } else {
+    cat(mod, "- no significant diagnosis effects\n")
+  }
+  cat("   matched IC", matched_IC[mod], "| p_FDR =", round(pvals_fdr[matched_IC[mod]], 4), "\n")
+}
+```
