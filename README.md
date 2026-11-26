@@ -44,15 +44,16 @@ Freesurfer: recon-all, was done by Jente Meier previously and I was able to use 
 14. imputation.Rmd (preparation) → run_imputation.sh (requires Imputation toolbox) → imputation.Rmd (before/after comparison).
 
 ## Analyses
-15. multimodal_IC_plot.Rmd: MMI and modality contributions.
-16. robustness_of_model_order.Rmd
-17. noise_analysis.Rmd
-18. statistical_analysis.Rmd: ANCOVA and the symptom associations.
-19. preparing_data_PLS.m → my_pls_analysis.m (requires PLS toolbox) → pls_holdout.m (requires PLS toolbox)
-20. unimodal_flica.sh (requires FLICA toolbox) and unimodal_multimodal.Rmd 
-21. thresholding_for_overlap.sh → HOA_overlap.sh and detrieux_overlap.sh → Spatialmaps.Rmd
-22. SVM_threshold.py and SVM_nr_features.py
-23. supplementary_analyses.Rmd: the IQ and TBV controls.
+15. robustness_of_model_order.Rmd
+16. noise_analysis.Rmd
+17. statistical_analysis.Rmd: ANCOVA and the symptom associations.
+18. preparing_data_PLS.m → my_pls_analysis.m (requires PLS toolbox) → pls_holdout.m (requires PLS toolbox)
+19. unimodal_flica.sh (requires FLICA toolbox) and unimodal_multimodal.Rmd 
+20. thresholding_for_overlap.sh → HOA_overlap.sh and detrieux_overlap.sh → Spatialmaps.Rmd
+21. SVM_threshold.py and SVM_nr_features.py
+22. supplementary_analyses.Rmd: the IQ and TBV controls.
+    
 ### Plots
+- multimodal_IC_plot.Rmd: MMI and modality contributions.
 - wordcloud.Rmd
 - CorrelationMatrix.Rmd
