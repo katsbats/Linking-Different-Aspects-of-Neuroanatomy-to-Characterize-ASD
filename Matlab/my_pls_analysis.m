@@ -88,24 +88,24 @@ n_subj = size(X,1);
 
 for s = 1:5
     rng(s);
-    boot_wX = zeros(n_boot, size(X,2));
+    boot_wX = zeros(n_boot, size(X,2)); % create empty tables 
     boot_wY = zeros(n_boot, size(Y,2));
 
     for b = 1:n_boot
-        idx = randi(n_subj, n_subj, 1);
-        Xb = zscore(X(idx,:));
+        idx = randi(n_subj, n_subj, 1); % draw random samples with replacement
+        Xb = zscore(X(idx,:));          % re-standardize within sample
         Yb = zscore(Y(idx,:));
-        [U,~,V] = svd(Xb'*Yb, 'econ');
+        [U,~,V] = svd(Xb'*Yb, 'econ');  % PLS
         wXb = U(:,1);
         wYb = V(:,1);
-        if wYb' * wY < 0
+        if wYb' * wY < 0                % signs of saliences are arbitrary -> we want all saliences to point the same way as the original
             wXb = -wXb;  wYb = -wYb;
         end
         boot_wX(b,:) = wXb;
         boot_wY(b,:) = wYb;
     end
 
-    bsr_X_s = wX ./ std(boot_wX)';
+    bsr_X_s = wX ./ std(boot_wX)';    % original weight / how much it varied during the bootstrapping
     bsr_Y_s = wY ./ std(boot_wY)';
 
     fprintf('seed %d: %d clinical, %d brain, max|BSR_Y| = %.4f\n', s, sum(abs(bsr_X_s)>2), sum(abs(bsr_Y_s)>2), max(abs(bsr_Y_s)));
