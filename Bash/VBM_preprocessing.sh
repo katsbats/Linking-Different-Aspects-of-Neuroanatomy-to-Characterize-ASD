@@ -1,4 +1,5 @@
 #### preprocessing steps for VBM prior to FLICA ####
+# requires FSL
 output_dir="/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer"
 
 # Extract the s8mwp1 images into a VBM file
