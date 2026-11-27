@@ -1,3 +1,4 @@
+% requires SPM
 s_cloud = 1;
 
  
