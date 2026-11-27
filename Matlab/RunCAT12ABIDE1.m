@@ -1,3 +1,4 @@
+% requires CAT and SPM
 s_cloud = 1;
  
 if s_cloud == 1
