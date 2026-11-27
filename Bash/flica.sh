@@ -1,6 +1,6 @@
 ##### Linked ICA (FLICA) on VBM, JD, CT and SA ####
 # Main analysis: 150 ICs, second-filter sample (N = 955), 1500 iterations
-# This script uses the FLICA repository from Llera and the environment that he defined in his FLICA folder. This has been saved as a conda environment as flica_env
+# This script uses the FLICA toolbox and the environment that was defined in that toolbox. This has been saved as a conda environment as flica_env
 
 # For 250 ICs, full sample, 3000 iterations (first try)
 ~/miniconda3/envs/flica_env/bin/python /mnt/methlab-drive/methlab/Students/Katharina_Bremer/flica/flica.py \
