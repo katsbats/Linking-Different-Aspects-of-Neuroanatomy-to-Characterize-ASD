@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ### Threshold spatial maps VBM, JD of IC37 and IC1 ###
+# requires FSL and FreeSurfer
 
 FLICA_DIR='/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/150ica_secondfilter'
 VBM_DIR="${FLICA_DIR}/VBM_R"
