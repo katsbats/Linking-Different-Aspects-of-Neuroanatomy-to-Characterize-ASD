@@ -1,5 +1,6 @@
 #!/opt/homebrew/bin/bash
 
+# requires FSL and AFNI
 #### Definition of directories #####
 dir_vbm=/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/150ica_secondfilter/VBM_R
 dir_jd="/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Flica_Output/ABIDE/iterations1500/FSL_format/150ica_secondfilter/JD_R"
