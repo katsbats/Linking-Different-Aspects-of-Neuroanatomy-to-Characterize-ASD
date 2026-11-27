@@ -1,4 +1,5 @@
 ### Convert SA and CT into 3d surface files ###
+# requires FreeSurfer
 output_dir="/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer"
 
 # Extract all files: lh area 
