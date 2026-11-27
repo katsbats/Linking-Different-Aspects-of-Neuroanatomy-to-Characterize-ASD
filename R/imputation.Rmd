@@ -9,7 +9,7 @@ output: html_document
 The actual imputation is done with the git_hub package imputation_master, this script does the prep work and analyses the outcome of the imputation. 
 
 # Packages
-```{r }
+```{r setup, include=FALSE}
 library(dplyr)
 library(tidyr)
 library(readxl)
@@ -17,7 +17,7 @@ library(ggplot2)
 ```
 
 ## Prepare the data for imputation
-```{r setup, include=FALSE}
+```{r}
 behaviourals_before <- read.csv('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/FSL_pheno_second_filter_cleaned.csv') %>%
   filter(DX_GROUP == 1)  # autistic participants only
 
