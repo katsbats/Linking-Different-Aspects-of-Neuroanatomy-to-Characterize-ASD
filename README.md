@@ -26,40 +26,40 @@ This repository contains all the scripts and data necessary to reproduce the res
 ## Preprocessing
 Freesurfer: recon-all for the ABIDE datasets was done previously by Meijer et al. (2024) and I was able to use that output. Two sites, which were missing from that output, were run by myself. For Information on how to run recon-all see: run_freesurfer_instructions.txt
 
-1. RunCAT12ABIDE1.m, RunCAT12ABIDE2.m (requires CAT12 and SPM)
-2. MNImask.txt
+1. RunCAT12ABIDE1.m, RunCAT12ABIDE2.m (requires CAT and SPM)
+2. MNImask.txt (requires AFNI)
 3. smooth8SPMABIDE.m (requires SPM)
-4. fsaverage.sh (requires Freesurfer) 
+4. fsaverage.sh (requires FreeSurfer) 
 
 ## Quality Control and Sample Selection
 5. coveragecheck90.sh
 6. extractingIQRABIDE1.m, extractingIQRABIDE2.m
 7. combine_asegtables.Rmd
-8. exclusion_of_subs.Rmd -> gives us ABIDEu30_final_subs.txt
+8. exclusion_of_subs.Rmd 
 
 ## LICA
 9. VBM_preprocessing.sh, JD_preprocessing.sh, mri_concat.sh ("wholesample" section)
 10. flica.sh (whole-sample run, requires FLICA toolbox)
 11. subject_dominance.Rmd (and the Stanford exclusion)
--> Steps 10 and 11 again, using the "first filter" sections.
+-> Steps 10 and 11 again, using the "first filter" sections
 12. subject_dominance.Rmd (second round)
--> Steps 10 and 11 again, using the "second filter" sections. This gives the main analysis, plus the 140 and 160 runs.
+-> Steps 10 and 11 again, using the "second filter" sections, this gives the main decomposition, plus the 140 and 160 runs
 
 ## Phenotypic Data
 13. characterization_sample.Rmd 
-14. imputation.Rmd (preparation) → run_imputation.sh (requires Imputation toolbox) → imputation.Rmd (before/after comparison).
+14. imputation.Rmd (the preparation portion) → run_imputation.sh (requires Imputation toolbox) → imputation.Rmd (the before/after comparison)
 
 ## Analyses
 15. robustness_of_model_order.Rmd
 16. noise_analysis.Rmd
-17. statistical_analysis.Rmd: ANCOVA and the symptom associations.
+17. statistical_analysis.Rmd
 18. preparing_data_PLS.m → my_pls_analysis.m (requires PLS toolbox) → pls_holdout.m (requires PLS toolbox)
 19. unimodal_flica.sh (requires FLICA toolbox) and unimodal_multimodal.Rmd 
-20. thresholding_for_overlap.sh → HOA_overlap.sh and detrieux_overlap.sh → Spatialmaps.Rmd
+20. thresholding_for_overlap.sh → HOA_overlap.sh (requires AFNI) and detrieux_overlap.sh → Spatialmaps.Rmd
 21. SVM_threshold.py and SVM_nr_features.py
-22. supplementary_analyses.Rmd: the IQ and TBV controls.
+22. supplementary_analyses.Rmd
     
 ### Plots
-- multimodal_IC_plot.Rmd: MMI and modality contributions.
+- multimodal_IC_plot.Rmd
 - wordcloud.Rmd
 - CorrelationMatrix.Rmd
