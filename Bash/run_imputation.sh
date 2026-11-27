@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### Imputation of the clinical scores ###
-# Uses the imputation toolbox from Llera et al. (2022): download the Imputation-master folder first.
+# Uses the Imputation toolbox (see README)
 # Input:  data_for_imputation_FSL.csv (created by the imputation-preparation R script)
 # Output: Imputation_Output/data_for_imputation_FSL_imputed.xlsx
 
