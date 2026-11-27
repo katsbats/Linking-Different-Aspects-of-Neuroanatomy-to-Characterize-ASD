@@ -1,4 +1,5 @@
 ### Coverage check ###
+# requires FSL
 
 output_dir="/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer"
 
