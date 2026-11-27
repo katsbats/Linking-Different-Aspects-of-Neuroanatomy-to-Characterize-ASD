@@ -1,4 +1,5 @@
 #### MNI brain masks ####
+# Requires FSL and AFNI
 # Resample the FSL MNI152 brain mask to the resolution of the data.
 # -rmode NN = nearest-neighbour interpolation, so the mask stays binary (0/1)
 
