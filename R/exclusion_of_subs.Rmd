@@ -69,12 +69,10 @@ ABIDEall_pheno <- bind_rows(ABIDE1_pheno, ABIDE2_pheno)
 
 nrow(ABIDEall_pheno) == nrow(ABIDE1_pheno) + nrow(ABIDE2_pheno)  # sanity check: should be TRUE
 
-# #saving this step
-# saveRDS(ABIDE1_pheno, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_BC.rds')
-# 
-# saveRDS(ABIDE2_pheno,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_BC.rds')
-# 
-# saveRDS(ABIDEall_pheno, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_BC.rds')
+# saving this step
+saveRDS(ABIDE1_pheno, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_BC.rds')
+saveRDS(ABIDE2_pheno,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_BC.rds')
+saveRDS(ABIDEall_pheno, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_BC.rds')
 ```
 
 
@@ -165,11 +163,9 @@ sum(ABIDE2_IQR_bigger3$SUB_ID %in% ABIDE2_pheno_IQR$SUB_ID)  # sanity check: sho
 ABIDEall_pheno_IQR <- bind_rows(ABIDE1_pheno_IQR, ABIDE2_pheno_IQR)
 
 # Saving this step
-# saveRDS(ABIDE1_pheno_IQR, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_IQR.rds')
-# 
-# saveRDS(ABIDE2_pheno_IQR, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_IQR.rds')
-# 
-# saveRDS(ABIDEall_pheno_IQR, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_IQR.rds')
+saveRDS(ABIDE1_pheno_IQR, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_IQR.rds')
+saveRDS(ABIDE2_pheno_IQR, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_IQR.rds')
+saveRDS(ABIDEall_pheno_IQR, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_IQR.rds')
 ```
 
 
@@ -226,12 +222,11 @@ ABIDEall_pheno_clean <- bind_rows(ABIDE1_pheno_clean, ABIDE2_pheno_clean)
 nrow(ABIDEall_pheno_clean) == nrow(ABIDE1_pheno_clean) + nrow(ABIDE2_pheno_clean)  # sanity check: should be TRUE
 
 #Saving this step
+saveRDS(ABIDE1_pheno_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_after_visualQC.rds')
 
-# saveRDS(ABIDE1_pheno_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_after_visualQC.rds')
-# 
-# saveRDS(ABIDE2_pheno_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_after_visualQC.rds')
-# 
-# saveRDS(ABIDEall_pheno_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_after_visualQC.rds')
+saveRDS(ABIDE2_pheno_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_after_visualQC.rds')
+
+saveRDS(ABIDEall_pheno_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_after_visualQC.rds')
 ```
 
 
@@ -254,10 +249,6 @@ aseg_stats_ABIDE1  <- aseg_stats_ABIDE1  %>% mutate(dataset = "ABIDE1")
 aseg_stats_ABIDE2  <- aseg_stats_ABIDE2  %>% mutate(dataset = "ABIDE2")
 ABIDE1_pheno_clean <- ABIDE1_pheno_clean %>% mutate(dataset = "ABIDE1")
 ABIDE2_pheno_clean <- ABIDE2_pheno_clean %>% mutate(dataset = "ABIDE2")
-
-colnames(aseg_stats_ABIDE1)[1] <- "SUB_ID"
-colnames(aseg_stats_ABIDE2)[1] <- "SUB_ID"
-
 
 #lets first exclude those that had a freesurfer error (according to Jente)
 fs_errors <- c(29733, 29740, 28682, 50049, 29759, 29742, 29746, 29736, 29741, 29599)
@@ -358,13 +349,13 @@ sum(ABIDE2_pheno_sitewise_clean$SUB_ID %in% excluded_ids)  # sanity check: shoul
 ABIDEall_pheno_sitewise <- bind_rows(ABIDE1_pheno_sitewise_clean, ABIDE2_pheno_sitewise_clean)
 
 # Saving the data
-# saveRDS(ABIDE_final_sitewise_all, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE_final_sitewise_all.rds')
-# 
-# saveRDS(ABIDE1_pheno_sitewise_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_sitewise_clean.rds' )
-# 
-# saveRDS(ABIDE2_pheno_sitewise_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_sitewise_clean.rds' )
-# 
-# saveRDS(ABIDEall_pheno_sitewise,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_sitewise.rds' )
+saveRDS(ABIDE_final_sitewise_all, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE_final_sitewise_all.rds')
+
+saveRDS(ABIDE1_pheno_sitewise_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE1_pheno_sitewise_clean.rds' )
+
+saveRDS(ABIDE2_pheno_sitewise_clean,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE2_pheno_sitewise_clean.rds' )
+
+saveRDS(ABIDEall_pheno_sitewise,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDEall_pheno_sitewise.rds' )
 ```
 
 # 5) QOALA 
@@ -458,16 +449,15 @@ ABIDEall_pheno_afterQOALA <- ABIDE_pheno_sitewise_all[!(ABIDE_pheno_sitewise_all
 
 
 # Save this step
-# write_csv(ABIDEall_aseg_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_aseg_afterQOALA.csv')
-# write_csv(ABIDEall_pheno_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_pheno_afterQOALA.csv')
-# 
-# saveRDS(ABIDEall_aseg_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_aseg_afterQOALA.rds')
-# saveRDS(ABIDEall_pheno_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_pheno_afterQOALA.rds')
-# 
+write_csv(ABIDEall_aseg_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_aseg_afterQOALA.csv')
+write_csv(ABIDEall_pheno_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_pheno_afterQOALA.csv')
+
+saveRDS(ABIDEall_aseg_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_aseg_afterQOALA.rds')
+saveRDS(ABIDEall_pheno_afterQOALA,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_pheno_afterQOALA.rds')
+
 
 
 # Plot: threshold 50 (default) vs. 40, in the cleaned sample
-library(patchwork)
 
 ABIDE_final_sitewise_all <- readRDS('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/ABIDE_final_sitewise_all.rds')
 
@@ -552,7 +542,7 @@ table(ABIDEall_pheno_mergedsites$SITE_ID)  # subjects per site after merging
 
 
 # Save this step
-#saveRDS(ABIDEall_pheno_mergedsites,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_pheno_merged.rds' )
+saveRDS(ABIDEall_pheno_mergedsites,'/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDEall_pheno_merged.rds' )
 
 ```
 
@@ -607,20 +597,6 @@ ABIDE_under30_overview <- ABIDEall_pheno_merged %>%
     Total          = n()
   )
 
-# Plot group sizes per site with possible cut-offs (3, 5, 10)
-overview_long <- ABIDE_under30_overview %>%
-  pivot_longer(cols = c(Male_Autism, Male_Control, Female_Autism, Female_Control),
-               names_to = "Group", values_to = "Count")
-
-p_sites <- ggplot(overview_long, aes(SITE_ID, Count, fill = Group)) +
-  geom_col(position = "dodge") +
-  geom_hline(yintercept = c(3, 5, 10)) +
-  theme(axis.text.x = element_text(angle = 90))
-p_sites
-
-ggsave("/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/ABIDEu30_site_female_cutoffs.pdf",
-       plot = p_sites, width = 12, height = 6)
-
 # Keep sites with at least 3 participants in every sex x diagnosis group
 site_ok <- with(ABIDE_under30_overview,
                 Male_Autism >= 3 & Male_Control >= 3 & Female_Autism >= 3 & Female_Control >= 3)
@@ -665,8 +641,8 @@ ABIDE_final_overview_total
 
 
 # Save the final sample
-# saveRDS(ABIDEall_filtered_under30,   '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDE_FINAL_under30.rds')
-# write_csv(ABIDEall_filtered_under30, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDE_FINAL_under30.csv')
+saveRDS(ABIDEall_filtered_under30,   '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDE_FINAL_under30.rds')
+write_csv(ABIDEall_filtered_under30, '/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDE_FINAL_under30.csv')
 
 
 ## Figure for the thesis: age distribution before the age cut-off
@@ -735,7 +711,7 @@ ggsave("/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Output/Plots/ABI
 ```
 
 
-#final sample file for FLICA run (only sub ids)
+# Final sample file for FLICA run (only sub ids)
 ```{r}
 
 final_sample_u30 <- readRDS('/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer/Scripts/R Studio/data/data_final/ABIDE_FINAL_under30.rds')
