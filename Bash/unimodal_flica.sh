@@ -1,5 +1,7 @@
 #### FLICA for unimodal decompositions ###
 
+# requires FLICA toolbox (see README)
+
 # CT
 ~/miniconda3/envs/flica_env/bin/python /mnt/methlab-drive/methlab/Students/Katharina_Bremer/flica/flica.py \
   -nICAs 100 -maxits 1500 -lambda_dims R \
