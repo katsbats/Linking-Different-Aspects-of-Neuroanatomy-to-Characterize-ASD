@@ -24,7 +24,7 @@ This repository contains all the scripts and data necessary to reproduce the res
 
 # To exactly reproduce the results, run the scripts in the following order:
 ## Preprocessing
-Freesurfer: recon-all, was done by Jente Meier previously and I was able to use her output. Two datasets, which were missing, were run by myself.
+Freesurfer: recon-all, was done by Meijer et al. (2024) previously and I was able to use her output. Two datasets, which were missing, were run by myself.
 1. RunCAT12ABIDE1.m, RunCAT12ABIDE2.m (requires CAT12 and SPM)
 2. MNImask.txt
 3. smooth8SPMABIDE.m (requires SPM)
