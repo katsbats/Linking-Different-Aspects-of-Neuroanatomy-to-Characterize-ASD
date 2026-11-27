@@ -362,7 +362,7 @@ saveRDS(ABIDEall_pheno_sitewise,'/Volumes/g_psyplafor_methlab$/Students/Katharin
 Automated QC of the FreeSurfer output with the Qoala-T model (Klapwijk et al., 2019).
 The first part follows the original Qoala-T script. Subjects with a Qoala-T score < 40 are excluded.
 
-```{r QOALA}
+```{r}
 # Packages needed by the Qoala-T model
 packages <- c("caret", "corrplot", "gbm", "plyr", "randomForest", "e1071",
               "pROC", "dplyr", "pbkrtest", "car", "doParallel", "ROSE", "repmis", "ggplot2", "readr")
