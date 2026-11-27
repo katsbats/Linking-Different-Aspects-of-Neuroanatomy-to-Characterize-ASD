@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ## For surface area, I want to use Destrieux atlas  
+# requires FreeSurfer 
 
 #### definition of directories ####
 # Note: "PA"/"area" = FreeSurfer white-surface area, not pial area
