@@ -18,6 +18,7 @@ This repository contains all the scripts and data necessary to reproduce the res
 #### Other 
 - [CAT](https://neuro-jena.github.io/cat/#download) (the version 12.9, r2577 was used in this thesis) and [SPM](https://www.fil.ion.ucl.ac.uk/spm/docs/installation/) (the version 25.01.02 was used in this thesis)
 - [Freesurfer](https://surfer.nmr.mgh.harvard.edu/)
+- [AFNI] (https://afni.nimh.nih.gov/)
 
 
 
