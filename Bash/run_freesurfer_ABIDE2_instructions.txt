@@ -1,0 +1,36 @@
+
+### FreeSurfer recon-all for the additional sites (ABIDE II USM, U_MIA) ###
+
+# The FreeSurfer output for all other subjects was provided by Jente Meijer (see README). These instructions were also provided by Jente Meijer, but adapted to my directory. 
+
+# FreeSurfer setup
+export FREESURFER_HOME=/home/ubuntu/freesurfer
+source $FREESURFER_HOME/SetUpFreeSurfer.sh
+
+# Output on local disk (NOT /mnt/methlab-drive)
+export SUBJECTS_DIR=/home/ubuntu/OutputFreesurfer/FreeSurferUSMsite
+mkdir -p "$SUBJECTS_DIR"
+
+mkdir -p /home/ubuntu/Input
+
+# Build input list
+find "/mnt/methlab-drive/methlab/Students/Katharina_Bremer/Input/ABIDE_II_USM" -name anat.nii > /home/ubuntu/Input/recon_all_input_USM.txt
+
+cores=32
+while read -r line; do
+echo "$line"
+
+SUBJECT=$(basename "$(dirname "$line")" | sed 's/^USM_//')
+
+echo "Processing: $SUBJECT"
+
+recon-all -i "$line" -s "USM_$SUBJECT" -all &
+
+# throttle
+while (( $(jobs -p | wc -l) >= $cores )); do
+wait -n
+done
+
+done < /home/ubuntu/Input/recon_all_input_USM.txt
+
+wait
