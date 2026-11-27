@@ -2,7 +2,7 @@
 ### FreeSurfer recon-all ###
 
 # The FreeSurfer output for all other subjects was provided by Meijer et al. (2024) (see README). These instructions are adapted from Meijer et al. (2024).
-## these instructions were used for the additional sites (ABIDE II USM, U_MIA) 
+# these instructions were used for the additional sites (ABIDE II USM, U_MIA) 
 
 # FreeSurfer setup
 export FREESURFER_HOME=/home/ubuntu/freesurfer
