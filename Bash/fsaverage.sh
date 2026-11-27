@@ -1,4 +1,5 @@
 #### create fsaverage ####
+# requires FreeSurfer
 
 # ABIDE 1
 export SUBJECTS_DIR="/mnt/methlab-drive/methlab/Students/Jente/OutputABIDE1"
