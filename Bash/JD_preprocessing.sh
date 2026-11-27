@@ -1,4 +1,5 @@
 #### preprocessing steps for JD prior to FLICA ####
+# requires FSL
 output_dir="/Volumes/g_psyplafor_methlab$/Students/Katharina_Bremer"
 
 # Extracting wj images for each subject
