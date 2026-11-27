@@ -14,17 +14,17 @@ This repository contains all the scripts and data necessary to reproduce the res
 - [LICA](https://github.com/allera/Llera_elife_2019_1)
 - [Imputation](https://github.com/allera/Imputation)
 - [PLS](https://github.com/MLNL/cca_pls_toolkit/tree/v1.0.0)
-- [QOALA-T](https://github.com/Qoala-T/QC)
+- [Qoala-T](https://github.com/Qoala-T/QC)
 #### Other 
 - [CAT](https://neuro-jena.github.io/cat/#download) (the version 12.9, r2577 was used in this thesis) and [SPM](https://www.fil.ion.ucl.ac.uk/spm/docs/installation/) (the version 25.01.02 was used in this thesis)
-- [Freesurfer](https://surfer.nmr.mgh.harvard.edu/)
+- [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/)
 - [AFNI](https://afni.nimh.nih.gov/)
-
+- [FSL](https://fsl.fmrib.ox.ac.uk/fsl/docs/)
 
 
 # To exactly reproduce the results, run the scripts in the following order:
 ## Preprocessing
-Freesurfer: recon-all for the ABIDE datasets was done previously by Meijer et al. (2024) and I was able to use that output. Two sites, which were missing from that output, were run by myself. For Information on how to run recon-all see: run_freesurfer_instructions.txt
+Freesurfer: recon-all for the ABIDE datasets was done previously by Meijer et al. (2024) and I was able to use that output. Two sites, which were missing from that output, were run by myself. For information on how to run recon-all see: run_freesurfer_instructions.txt
 
 1. RunCAT12ABIDE1.m, RunCAT12ABIDE2.m (requires CAT and SPM)
 2. MNImask.txt (requires AFNI)
@@ -41,9 +41,9 @@ Freesurfer: recon-all for the ABIDE datasets was done previously by Meijer et al
 9. VBM_preprocessing.sh, JD_preprocessing.sh, mri_concat.sh ("wholesample" section)
 10. flica.sh (whole-sample run, requires FLICA toolbox)
 11. subject_dominance.Rmd (and the Stanford exclusion)
--> Steps 10 and 11 again, using the "first filter" sections
+-> Steps 9 and 10 again, using the "first filter" sections
 12. subject_dominance.Rmd (second round)
--> Steps 10 and 11 again, using the "second filter" sections, this gives the main decomposition, plus the 140 and 160 runs
+-> Steps 9 and 10 again, using the "second filter" sections, this gives the main decomposition, plus the 140 and 160 runs
 
 ## Phenotypic Data
 13. characterization_sample.Rmd 
